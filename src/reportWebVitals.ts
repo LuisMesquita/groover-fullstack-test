@@ -11,7 +11,7 @@ const reportWebVitals = (onPerfEntry?: ReportHandler) => {
         getTTFB(onPerfEntry);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   }
 };

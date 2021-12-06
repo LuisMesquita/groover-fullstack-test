@@ -9,19 +9,15 @@ import {
 } from "./constants";
 import { queryString } from "./utils";
 
-type GetArticlesParams = {
+export type GetArticlesParams = {
   fullText?: string;
   page?: number;
   facets?: Record<string, string[]>;
 };
 
-interface SearchArticlesResponse {
-  status: number;
-  copyright: string;
-  response: {
-    docs: Article;
-  };
-}
+export type GetArticleById = {
+  id?: string;
+};
 
 export const getArticles = async ({
   fullText = "",
@@ -34,7 +30,7 @@ export const getArticles = async ({
       []
     )
     .join(" AND ");
-
+  throw new Error("Id required");
   const query = {
     q: fullText,
     page,
@@ -51,18 +47,24 @@ export const getArticles = async ({
     throw new Error(response.statusText);
   }
 
-  return response.json() as Promise<SearchArticlesResponse>;
+  const data = await response.json();
+  return data?.response?.docs as Article[];
 };
 
-export const getArticlesById = async (id?: string) => {
-  console.log({ id });
+export const getArticleById = async ({ id }: GetArticleById) => {
   if (!id) {
     throw new Error("Id required");
   }
+  throw new Error("Id required");
+  try {
+    const data = await getArticles({
+      fullText: undefined,
+      page: undefined,
+      facets: { _id: [`"${id}"`] },
+    });
 
-  return getArticles({
-    fullText: undefined,
-    page: undefined,
-    facets: { _id: [`"${NYT_ARTICLE_URI}${id}"`] },
-  });
+    return data[0] as Article;
+  } catch (error) {
+    throw error;
+  }
 };

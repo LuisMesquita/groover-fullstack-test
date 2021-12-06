@@ -1,10 +1,19 @@
 import { useParams } from "react-router";
-import { getArticlesById } from "../api";
+import { useArticleById } from "../hooks";
 
 const Article = () => {
   const { articleId } = useParams();
-  getArticlesById(articleId).then((res) => console.log({ res: res }));
-  return <div>{articleId} Detail Page</div>;
+  const { isLoading, data, isError, error } = useArticleById({ id: articleId });
+
+  if (isLoading) {
+    return <div> isLoading </div>;
+  }
+
+  if (isError) {
+    return <div> {error?.message} </div>;
+  }
+
+  return <div>{data?.snippet}</div>;
 };
 
 export default Article;

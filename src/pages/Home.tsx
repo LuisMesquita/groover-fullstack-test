@@ -1,11 +1,21 @@
-import { getArticles } from "../api";
+import { Link } from "react-router-dom";
+import { useGetArticles } from "../hooks";
+import { getHashId } from "../utils";
 
 const Home = () => {
-  getArticles({ fullText: "Spelling Bee Forum" }).then((res) =>
-    console.log({ res: res.response.docs })
-  );
+  const { data, isError, error } = useGetArticles({ fullText: "" });
 
-  return <div>Home Page</div>;
+  if (isError) {
+    return <div> {error?.message} </div>;
+  }
+
+  return (
+    <div>
+      {data?.map((doc) => (
+        <Link to={`/article/${getHashId(doc._id)}`}>{doc.snippet}</Link>
+      ))}
+    </div>
+  );
 };
 
 export default Home;
