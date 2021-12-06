@@ -6,7 +6,7 @@ import {
   API_ENDPOINT,
   DEFAULT_FACET_FIELDS,
   NYT_ARTICLE_URI,
-} from "./constants";
+} from "../contants";
 import { queryString } from "./utils";
 
 export type GetArticlesParams = {
@@ -30,7 +30,6 @@ export const getArticles = async ({
       []
     )
     .join(" AND ");
-  throw new Error("Id required");
   const query = {
     q: fullText,
     page,
@@ -55,7 +54,7 @@ export const getArticleById = async ({ id }: GetArticleById) => {
   if (!id) {
     throw new Error("Id required");
   }
-  throw new Error("Id required");
+
   try {
     const data = await getArticles({
       fullText: undefined,

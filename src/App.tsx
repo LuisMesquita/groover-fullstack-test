@@ -3,11 +3,10 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Layout } from "./container/";
+import { ONE_HOUR } from "./contants";
 
 const Home = lazy(() => import("./pages/Home"));
 const Article = lazy(() => import("./pages/Article"));
-
-const ONE_HOUR = 1000 * 60 * 60;
 
 export const queryClient = new QueryClient();
 queryClient.setDefaultOptions({
