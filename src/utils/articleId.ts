@@ -1,4 +1,4 @@
-import { NYT_ARTICLE_URI } from "../api/constants";
+import { NYT_ARTICLE_URI } from "../contants";
 
 // nyt://article/hash => hash
 export const getHashId = (fullId: string) => fullId.split("/")[3];

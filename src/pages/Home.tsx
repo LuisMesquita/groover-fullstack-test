@@ -3,7 +3,7 @@ import { useGetArticles } from "../hooks";
 import { getHashId } from "../utils";
 
 const Home = () => {
-  const { data, isError, error } = useGetArticles({ fullText: "" });
+  const { data, isError, error } = useGetArticles();
 
   if (isError) {
     return <div> {error?.message} </div>;
