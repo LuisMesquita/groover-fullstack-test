@@ -4,7 +4,8 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ArticleList } from "../mockserver/fixtures/search";
 
-const searchText = "brooklyn";
+const searchText = "brooklyn{enter}";
+const invalidInput = "invalidinput";
 const articleList = ArticleList.response.docs;
 
 const loadArticles = async () => {
@@ -15,7 +16,7 @@ const loadArticles = async () => {
   expect(firstArticle).toBeInTheDocument();
 };
 
-describe("<Home />", () => {
+describe("<Home /> pagination", () => {
   it("should render List of articles with pagination", async () => {
     render(<Home />);
 
@@ -42,5 +43,19 @@ describe("<Home />", () => {
     userEvent.click(previousButton);
     await loadArticles();
     expect(previousButton).toBeDisabled();
+  });
+  it("should render empty State", async () => {
+    render(<Home />);
+
+    const searchInput = screen.getByLabelText(
+      /Type search query terms in here:/i
+    );
+
+    userEvent.type(searchInput, invalidInput);
+
+    await screen.findAllByTestId(/skeleton/i);
+
+    const emptyState = await screen.findByText(/no results found/i);
+    expect(emptyState).toBeInTheDocument();
   });
 });

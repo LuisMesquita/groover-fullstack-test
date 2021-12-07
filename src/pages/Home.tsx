@@ -2,26 +2,18 @@ import { Alert, AlertIcon, AlertTitle } from "@chakra-ui/alert";
 import { Button } from "@chakra-ui/button";
 import { CloseButton } from "@chakra-ui/close-button";
 import { Input } from "@chakra-ui/input";
-import {
-  Text,
-  Container,
-  LinkBox,
-  Flex,
-  VStack,
-  Spacer,
-  Link as LayoutLink,
-} from "@chakra-ui/layout";
-import { Skeleton } from "@chakra-ui/skeleton";
+import { Text, Container, Flex, Spacer } from "@chakra-ui/layout";
 import { useCallback, useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useDebounce } from "use-debounce/lib";
+import { ArticleList } from "../components";
 import { DEFAULT_PAGE, DEFAULT_PAGE_TILE } from "../contants";
 import { useGetArticles } from "../hooks";
-import { getHashId } from "../utils";
+import { ArticleSearch } from "../types";
 
 const Home = () => {
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [currentPage, setCurrentPage] = useState<ArticleSearch[] | undefined>();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || `${DEFAULT_PAGE}`);
   const searchValue = searchParams.get("searchValue") || "";
@@ -33,6 +25,7 @@ const Home = () => {
     fetchNextPage,
     fetchPreviousPage,
     hasNextPage,
+    isFetched,
     isFetching,
     isFetchingPreviousPage,
     isFetchingNextPage,
@@ -44,8 +37,8 @@ const Home = () => {
       data?.pageParams && data?.pageParams.indexOf(page) > 0
         ? data?.pageParams.indexOf(page)
         : 0;
-    setCurrentPageIndex(currentIndex);
-  }, [data?.pageParams, page]);
+    setCurrentPage(data?.pages?.[currentIndex]?.docs);
+  }, [data?.pageParams, data?.pages, page]);
 
   const handleNextPage = useCallback(() => {
     const nextPage = page + 1;
@@ -59,6 +52,11 @@ const Home = () => {
     fetchPreviousPage({ pageParam: prevPage });
   }, [fetchPreviousPage, page, searchValue, setSearchParams]);
 
+  const handleSubmit: React.ChangeEventHandler<HTMLInputElement> = (event) => {
+    event.preventDefault();
+    setSearchParams({ searchValue: event.target.value, page: "0" });
+  };
+
   return (
     <>
       <Helmet>
@@ -69,56 +67,31 @@ const Home = () => {
         </title>
       </Helmet>
       <Container>
-        <form>
-          <label aria-label="search" id="search-label">
-            <Text marginBottom="3" fontWeight="bold">
-              Type search query terms in here:
-            </Text>
-          </label>
-          <Input
-            type="text"
-            placeholder="Search for a article"
-            onChange={({ target: { value } }) =>
-              setSearchParams({ searchValue: value, page: "0" })
-            }
-            name="search"
-            aria-labelledby="search-label"
-            value={searchValue}
-            disabled={isFetching}
-            size="sm"
-            marginBottom="7"
-          />
-        </form>
+        <label aria-label="search" id="search-label">
+          <Text marginBottom="3" fontWeight="bold">
+            Type search query terms in here:
+          </Text>
+        </label>
+        <Input
+          type="text"
+          placeholder="Search for a article"
+          onChange={handleSubmit}
+          name="search"
+          aria-labelledby="search-label"
+          value={searchValue}
+          disabled={isFetching}
+          size="sm"
+          marginBottom="7"
+        />
         <>
           <Text marginBottom="2" fontWeight="bold">
             Results:
           </Text>
-          <VStack spacing={1} align="stretch">
-            {isFetching
-              ? Array(10)
-                  .fill("")
-                  .map((_, i) => (
-                    <Skeleton
-                      height="35px"
-                      key={i}
-                      data-testid="article-skeleton"
-                    />
-                  ))
-              : data?.pages[currentPageIndex]?.docs.map((doc) => (
-                  <LinkBox
-                    key={getHashId(doc._id)}
-                    borderWidth="1px"
-                    borderRadius="lg"
-                    padding="2"
-                  >
-                    <LayoutLink to={`/article/${getHashId(doc._id)}`} as={Link}>
-                      <Text fontSize="xs" noOfLines={1}>
-                        {doc.headline.main}
-                      </Text>
-                    </LayoutLink>
-                  </LinkBox>
-                ))}
-          </VStack>
+          <ArticleList
+            isFetched={isFetched}
+            isFetching={isFetching}
+            articles={currentPage}
+          />
         </>
         <Flex my="2" paddingX="1">
           <Button

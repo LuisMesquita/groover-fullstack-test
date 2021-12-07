@@ -1,5 +1,19 @@
 import { GetArticlesResponse, SearchApiResponse } from "../../api";
 
+export const EmptyList: SearchApiResponse<GetArticlesResponse> = {
+  status: "OK",
+  copyright:
+    "Copyright (c) 2021 The New York Times Company. All Rights Reserved.",
+  response: {
+    docs: [],
+    meta: {
+      hits: 0,
+      offset: 0,
+      time: 400,
+    },
+  },
+};
+
 export const ArticleList: SearchApiResponse<GetArticlesResponse> = {
   status: "OK",
   copyright:
