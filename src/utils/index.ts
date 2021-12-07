@@ -1,2 +1,2 @@
 export * from "./articleId";
-export * from "./query";
+export * from "./api";

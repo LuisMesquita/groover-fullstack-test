@@ -1,6 +1,21 @@
-import { useQuery } from "react-query";
-import { getArticles, GetArticlesParams } from "../api";
-import { Article } from "../types";
+import { useInfiniteQuery } from "react-query";
+import { getArticles, GetArticlesParams, GetArticlesResponse } from "../api";
 
-export const useGetArticles = (params?: GetArticlesParams) =>
-  useQuery<Article[], Error>("articles", () => getArticles(params));
+const PAGE_SIZE = 10;
+
+export const useGetArticles = (params?: GetArticlesParams) => {
+  return useInfiniteQuery<GetArticlesResponse, Error>(
+    ["articles", params?.fullText],
+    ({ pageParam }) => {
+      return getArticles({ ...params, pageParam });
+    },
+    {
+      enabled: Boolean(params?.fullText),
+      getNextPageParam: (lastPage, pages) => {
+        const currentPage = lastPage.meta.offset / PAGE_SIZE;
+        const totalPages = lastPage.meta.hits / PAGE_SIZE;
+        return currentPage < totalPages && currentPage + 1;
+      },
+    }
+  );
+};

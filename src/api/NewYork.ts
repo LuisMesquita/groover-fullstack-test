@@ -5,12 +5,13 @@ import {
   API_KEY,
   API_ENDPOINT,
   DEFAULT_FACET_FIELDS,
+  DETAIL_REQUIRED_FIELS,
 } from "../contants";
-import { queryString } from "../utils";
+import { facetQueryBuilder, queryString } from "../utils";
 
 export type GetArticlesParams = {
   fullText?: string;
-  page?: number;
+  pageParam?: number;
   facets?: Record<string, string[]>;
 };
 
@@ -18,23 +19,27 @@ export type GetArticleById = {
   id?: string;
 };
 
+type Meta = {
+  hits: number;
+  offset: number;
+  time: number;
+};
+export interface GetArticlesResponse {
+  docs: Article[];
+  meta: Meta;
+}
+
 export const getArticles = async (params?: GetArticlesParams) => {
   const {
     fullText = "",
-    page = DEFAULT_PAGE,
+    pageParam = DEFAULT_PAGE,
     facets = DEFAULT_FACET_FIELDS,
   } = params || {};
   try {
-    const facetQuery = Object.keys(facets)
-      .reduce<string[]>(
-        (query, key) => [...query, `${key}:(${facets[key].join(" ")})`],
-        []
-      )
-      .join(" AND ");
     const query = {
       q: fullText,
-      page,
-      fq: facetQuery,
+      page: pageParam,
+      fq: facetQueryBuilder(facets),
       fl: SEARCH_REQUIRED_FIELS.join(","),
       "api-key": API_KEY,
     };
@@ -48,7 +53,7 @@ export const getArticles = async (params?: GetArticlesParams) => {
     }
 
     const data = await response.json();
-    return data?.response?.docs as Article[];
+    return data?.response as GetArticlesResponse;
   } catch (error) {
     throw error;
   }
@@ -60,13 +65,22 @@ export const getArticleById = async ({ id }: GetArticleById) => {
   }
 
   try {
-    const data = await getArticles({
-      fullText: undefined,
-      page: undefined,
-      facets: { _id: [`"${id}"`] },
-    });
+    const response = await fetch(
+      `${API_ENDPOINT}articlesearch.json?${queryString({
+        fq: facetQueryBuilder({ _id: [`"${id}"`] }),
+        fl: DETAIL_REQUIRED_FIELS.join(","),
+        "api-key": API_KEY,
+      })}`
+    );
 
-    return data[0] as Article;
+    if (!response.ok) {
+      console.error(response.body);
+      throw new Error(response.statusText);
+    }
+
+    const data = await response.json();
+
+    return data?.response?.docs[0] as Article;
   } catch (error) {
     throw error;
   }
