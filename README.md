@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+This repository is part of the groover fullstack job application, check the [Project requirements](https://developers.grover.com/frontend-task/) 
+
 ## Getting Started
 
 First, install the packages with NPM:
