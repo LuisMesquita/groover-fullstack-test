@@ -1,4 +1,4 @@
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, Spinner } from "@chakra-ui/react";
 import { Suspense, lazy } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ReactQueryDevtools } from "react-query/devtools";
@@ -15,7 +15,7 @@ queryClient.setDefaultOptions({
 });
 
 const App = () => (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<Spinner size="lg" />}>
     <QueryClientProvider client={queryClient}>
       <ChakraProvider>
         <Router>

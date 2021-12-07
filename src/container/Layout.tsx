@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Container, Text } from "@chakra-ui/react";
 import { Outlet } from "react-router-dom";
 import { ErrorBoundary } from "./ErrorBoundary";
 
@@ -9,6 +9,8 @@ export const Layout = () => (
         "The New York Times" article search application
       </Text>
     </Box>
-    <Outlet />
+    <Container>
+      <Outlet />
+    </Container>
   </ErrorBoundary>
 );

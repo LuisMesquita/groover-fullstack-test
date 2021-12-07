@@ -1,8 +1,8 @@
 export type ArticleDetail = {
   web_url: string;
-  pub_data: string;
-  snippet: string;
+  pub_date: string;
   lead_paragraph: string;
+  headline: Headline;
   _id: string;
 };
 export type ArticleSearch = {

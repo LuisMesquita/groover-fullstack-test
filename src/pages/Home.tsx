@@ -9,6 +9,7 @@ import {
   Flex,
   VStack,
   Spacer,
+  Link as LayoutLink,
 } from "@chakra-ui/layout";
 import { Skeleton } from "@chakra-ui/skeleton";
 import { useCallback, useEffect, useState } from "react";
@@ -95,16 +96,16 @@ const Home = () => {
                   borderRadius="lg"
                   padding="2"
                 >
-                  <Link to={`/article/${getHashId(doc._id)}`}>
+                  <LayoutLink to={`/article/${getHashId(doc._id)}`} as={Link}>
                     <Text fontSize="xs" noOfLines={1}>
                       {doc.headline.main}
                     </Text>
-                  </Link>
+                  </LayoutLink>
                 </LinkBox>
               ))}
         </VStack>
       </>
-      <Flex marginTop="2" paddingX="1">
+      <Flex my="2" paddingX="1">
         <Button
           onClick={() => handlePrevPage()}
           disabled={isFetchingPreviousPage || page <= 0}

@@ -9,7 +9,7 @@ export const DETAIL_REQUIRED_FIELS = [
   "web_url",
   "pub_date",
   "lead_paragraph",
-  "snippet",
+  "headline",
   "_id",
 ];
 export const DEFAULT_FACET_FIELDS = {
