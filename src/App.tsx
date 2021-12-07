@@ -9,6 +9,11 @@ import { ONE_HOUR } from "./contants";
 const Home = lazy(() => import("./pages/Home"));
 const Article = lazy(() => import("./pages/Article"));
 
+if (process.env.NODE_ENV === "development") {
+  const { worker } = require("./mockserver/browser");
+  worker.start();
+}
+
 export const queryClient = new QueryClient();
 queryClient.setDefaultOptions({
   queries: { staleTime: ONE_HOUR },

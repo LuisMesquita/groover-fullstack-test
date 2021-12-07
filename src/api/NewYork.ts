@@ -28,6 +28,16 @@ export interface GetArticlesResponse {
   docs: ArticleSearch[];
   meta: Meta;
 }
+export interface GetArticleByIdResponse {
+  docs: ArticleDetail[];
+  meta: Meta;
+}
+
+export interface SearchApiResponse<response> {
+  status: string;
+  copyright: string;
+  response: response;
+}
 
 export const getArticles = async (params?: GetArticlesParams) => {
   const {

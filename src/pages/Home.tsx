@@ -20,6 +20,7 @@ import { useGetArticles } from "../hooks";
 import { getHashId } from "../utils";
 
 const Home = () => {
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || `${DEFAULT_PAGE}`);
   const searchValue = searchParams.get("searchValue") || "";
@@ -37,6 +38,14 @@ const Home = () => {
     status,
   } = useGetArticles({ fullText: debouncedSearchValue, pageParam: page });
 
+  useEffect(() => {
+    const currentIndex =
+      data?.pageParams && data?.pageParams.indexOf(page) > 0
+        ? data?.pageParams.indexOf(page)
+        : 0;
+    setCurrentPageIndex(currentIndex);
+  }, [data?.pageParams, page]);
+
   const handleNextPage = useCallback(() => {
     const nextPage = page + 1;
     setSearchParams({ page: nextPage.toString(), searchValue });
@@ -48,16 +57,6 @@ const Home = () => {
     setSearchParams({ page: prevPage.toString(), searchValue });
     fetchPreviousPage({ pageParam: prevPage });
   }, [fetchPreviousPage, page, searchValue, setSearchParams]);
-
-  const [currentPageIndex, setCurrentPageIndex] = useState(0);
-
-  useEffect(() => {
-    const currentIndex =
-      data?.pageParams && data?.pageParams.indexOf(page) > 0
-        ? data?.pageParams.indexOf(page)
-        : 0;
-    setCurrentPageIndex(currentIndex);
-  }, [data?.pageParams, page]);
 
   return (
     <Container>
