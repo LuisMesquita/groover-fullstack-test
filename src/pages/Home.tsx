@@ -1,16 +1,16 @@
 import { Alert, AlertIcon, AlertTitle } from "@chakra-ui/alert";
-import { Button, ButtonGroup } from "@chakra-ui/button";
+import { Button } from "@chakra-ui/button";
 import { CloseButton } from "@chakra-ui/close-button";
 import { Input } from "@chakra-ui/input";
 import {
   Text,
   Container,
   LinkBox,
-  StackDivider,
+  Flex,
   VStack,
+  Spacer,
 } from "@chakra-ui/layout";
 import { Skeleton } from "@chakra-ui/skeleton";
-import { Spinner } from "@chakra-ui/spinner";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDebounce } from "use-debounce/lib";
@@ -61,47 +61,68 @@ const Home = () => {
   return (
     <Container>
       <form>
+        <label aria-label="search">
+          <Text marginBottom="3" fontWeight="bold">
+            Type search query terms in here:
+          </Text>
+        </label>
         <Input
           type="text"
           placeholder="Search for a article"
           onChange={({ target: { value } }) =>
-            setSearchParams({ searchValue: value, page: page.toString() })
+            setSearchParams({ searchValue: value, page: "0" })
           }
+          name="search"
           value={searchValue}
           disabled={isFetching}
+          size="sm"
+          marginBottom="7"
         />
       </form>
-      <VStack
-        divider={<StackDivider borderColor="gray.200" />}
-        spacing={1}
-        align="stretch"
-      >
-        {isFetching
-          ? Array(10)
-              .fill("")
-              .map((_, i) => <Skeleton height="25px" key={i} />)
-          : data?.pages[currentPageIndex]?.docs.map((doc) => (
-              <LinkBox key={getHashId(doc._id)}>
-                <Link to={`/article/${getHashId(doc._id)}`}>
-                  <Text fontSize="sm">{doc.snippet}</Text>
-                </Link>
-              </LinkBox>
-            ))}
-      </VStack>
-      <ButtonGroup>
+      <>
+        <Text marginBottom="2" fontWeight="bold">
+          Results:
+        </Text>
+        <VStack spacing={1} align="stretch">
+          {isFetching
+            ? Array(10)
+                .fill("")
+                .map((_, i) => <Skeleton height="35px" key={i} />)
+            : data?.pages[currentPageIndex]?.docs.map((doc) => (
+                <LinkBox
+                  key={getHashId(doc._id)}
+                  borderWidth="1px"
+                  borderRadius="lg"
+                  padding="2"
+                >
+                  <Link to={`/article/${getHashId(doc._id)}`}>
+                    <Text fontSize="xs" noOfLines={1}>
+                      {doc.headline.main}
+                    </Text>
+                  </Link>
+                </LinkBox>
+              ))}
+        </VStack>
+      </>
+      <Flex marginTop="2" paddingX="1">
         <Button
           onClick={() => handlePrevPage()}
           disabled={isFetchingPreviousPage || page <= 0}
+          isLoading={isFetchingPreviousPage}
+          variant="link"
         >
-          {isFetchingPreviousPage ? <Spinner /> : "previous page"}
+          previous page
         </Button>
+        <Spacer />
         <Button
           onClick={() => handleNextPage()}
           disabled={!hasNextPage || isFetchingNextPage}
+          isLoading={isFetchingNextPage}
+          variant="link"
         >
-          {isFetchingNextPage ? <Spinner /> : "next page"}
+          next page
         </Button>
-      </ButtonGroup>
+      </Flex>
       {status === "error" && (
         <Alert status="error">
           <AlertIcon />

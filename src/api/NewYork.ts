@@ -1,4 +1,4 @@
-import { Article } from "../types";
+import { ArticleDetail, ArticleSearch } from "../types";
 import {
   DEFAULT_PAGE,
   SEARCH_REQUIRED_FIELS,
@@ -25,7 +25,7 @@ type Meta = {
   time: number;
 };
 export interface GetArticlesResponse {
-  docs: Article[];
+  docs: ArticleSearch[];
   meta: Meta;
 }
 
@@ -80,7 +80,7 @@ export const getArticleById = async ({ id }: GetArticleById) => {
 
     const data = await response.json();
 
-    return data?.response?.docs[0] as Article;
+    return data?.response?.docs[0] as ArticleDetail;
   } catch (error) {
     throw error;
   }
