@@ -6,10 +6,8 @@ const PAGE_SIZE = 10;
 export const useGetArticles = (params?: GetArticlesParams) => {
   return useInfiniteQuery<GetArticlesResponse, Error>(
     ["articles", params?.fullText],
-    ({ pageParam }) => {
-      const currentPage = pageParam || params?.pageParam;
-      return getArticles({ ...params, pageParam: currentPage });
-    },
+    ({ pageParam = params?.pageParam }) =>
+      getArticles({ ...params, pageParam }),
     {
       enabled: Boolean(params?.fullText),
       getNextPageParam: (lastPage, pages) => {

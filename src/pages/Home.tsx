@@ -1,4 +1,17 @@
-import { useCallback, useState } from "react";
+import { Alert, AlertIcon, AlertTitle } from "@chakra-ui/alert";
+import { Button, ButtonGroup } from "@chakra-ui/button";
+import { CloseButton } from "@chakra-ui/close-button";
+import { Input } from "@chakra-ui/input";
+import {
+  Text,
+  Container,
+  LinkBox,
+  StackDivider,
+  VStack,
+} from "@chakra-ui/layout";
+import { Skeleton } from "@chakra-ui/skeleton";
+import { Spinner } from "@chakra-ui/spinner";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useDebounce } from "use-debounce/lib";
 import { DEFAULT_PAGE } from "../contants";
@@ -35,10 +48,20 @@ const Home = () => {
     fetchPreviousPage({ pageParam: prevPage });
   }, [fetchPreviousPage, page, searchValue, setSearchParams]);
 
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
+  useEffect(() => {
+    const currentIndex =
+      data?.pageParams && data?.pageParams.indexOf(page) > 0
+        ? data?.pageParams.indexOf(page)
+        : 0;
+    setCurrentPageIndex(currentIndex);
+  }, [data?.pageParams, page]);
+
   return (
-    <div>
+    <Container>
       <form>
-        <input
+        <Input
           type="text"
           placeholder="Search for a article"
           onChange={({ target: { value } }) =>
@@ -48,41 +71,45 @@ const Home = () => {
           disabled={isFetching}
         />
       </form>
-      <>
-        {data?.pages[page || DEFAULT_PAGE]?.docs.map((doc) => (
-          <Link key={getHashId(doc._id)} to={`/article/${getHashId(doc._id)}`}>
-            {doc.snippet}
-          </Link>
-        ))}
-        <div>
-          <button
-            onClick={() => handlePrevPage()}
-            disabled={isFetchingPreviousPage || page <= 0}
-          >
-            {isFetchingNextPage
-              ? "Loading more..."
-              : page > 0
-              ? "Load More"
-              : "Nothing more to load"}
-          </button>
-        </div>
-        <div>
-          <button
-            onClick={() => handleNextPage()}
-            disabled={!hasNextPage || isFetchingNextPage}
-          >
-            {isFetchingNextPage
-              ? "Loading more..."
-              : hasNextPage
-              ? "Load More"
-              : "Nothing more to load"}
-          </button>
-        </div>
-        <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
-      </>
-
-      {status === "error" && <div> {error?.message} </div>}
-    </div>
+      <VStack
+        divider={<StackDivider borderColor="gray.200" />}
+        spacing={1}
+        align="stretch"
+      >
+        {isFetching
+          ? Array(10)
+              .fill("")
+              .map((_, i) => <Skeleton height="25px" key={i} />)
+          : data?.pages[currentPageIndex]?.docs.map((doc) => (
+              <LinkBox key={getHashId(doc._id)}>
+                <Link to={`/article/${getHashId(doc._id)}`}>
+                  <Text fontSize="sm">{doc.snippet}</Text>
+                </Link>
+              </LinkBox>
+            ))}
+      </VStack>
+      <ButtonGroup>
+        <Button
+          onClick={() => handlePrevPage()}
+          disabled={isFetchingPreviousPage || page <= 0}
+        >
+          {isFetchingPreviousPage ? <Spinner /> : "previous page"}
+        </Button>
+        <Button
+          onClick={() => handleNextPage()}
+          disabled={!hasNextPage || isFetchingNextPage}
+        >
+          {isFetchingNextPage ? <Spinner /> : "next page"}
+        </Button>
+      </ButtonGroup>
+      {status === "error" && (
+        <Alert status="error">
+          <AlertIcon />
+          <AlertTitle mr={2}>{error?.message}</AlertTitle>
+          <CloseButton position="absolute" right="8px" top="8px" />
+        </Alert>
+      )}
+    </Container>
   );
 };
 
