@@ -13,7 +13,7 @@ jest.mock("react-router-dom", () => ({
 }));
 
 describe("<Article />", () => {
-  it("should display loading and update products on list", async () => {
+  it("should display Article details", async () => {
     render(<Article />);
 
     await screen.findByRole("link", { name: /go to results page/i });

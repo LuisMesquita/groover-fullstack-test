@@ -5,6 +5,7 @@ import {
   Link as LayoutLink,
   Heading,
   Center,
+  Flex,
 } from "@chakra-ui/layout";
 import { Spinner } from "@chakra-ui/spinner";
 import { useMemo } from "react";
@@ -13,6 +14,7 @@ import { useArticleById } from "../hooks";
 import { format } from "date-fns";
 import { Helmet } from "react-helmet";
 import { DEFAULT_PAGE_TILE } from "../contants";
+import { Button } from "@chakra-ui/button";
 
 const Article = () => {
   const { articleId } = useParams();
@@ -43,6 +45,28 @@ const Article = () => {
     return <div> {error?.message} </div>;
   }
 
+  if (!data) {
+    return (
+      <>
+        <Helmet>
+          <title>Article not found | {pageTitle}</title>
+        </Helmet>
+        <Flex my={10} flexDirection="column" alignItems="center">
+          <Heading my={5}> 404 article not found </Heading>
+          <Text textAlign="center">
+            The <strong>{articleId}</strong> id is not valid, please try to see
+            the details of a different Product.
+          </Text>
+          <Button my={5} variant="link">
+            <LayoutLink as={Link} to={"/"} marginLeft="5">
+              Search for new articles
+            </LayoutLink>
+          </Button>
+        </Flex>
+      </>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -51,7 +75,7 @@ const Article = () => {
       <Container>
         <LayoutLink
           as={Link}
-          to={`-1`}
+          to={"-1"}
           onClick={() => navigate(-1)}
           marginBottom="2"
         >
@@ -66,12 +90,14 @@ const Article = () => {
         {data?.lead_paragraph && (
           <Text marginBottom="2">{data?.lead_paragraph}</Text>
         )}
-        <LayoutLink href={data?.web_url || ""} isExternal>
-          <Text fontSize="xs">
-            Read the full article{" "}
-            <ExternalLinkIcon mx="2px" marginBottom="2px" />
-          </Text>
-        </LayoutLink>
+        {data?.web_url && (
+          <LayoutLink href={data?.web_url} isExternal>
+            <Text fontSize="xs">
+              Read the full article{" "}
+              <ExternalLinkIcon mx="2px" marginBottom="2px" />
+            </Text>
+          </LayoutLink>
+        )}
       </Container>
     </>
   );
