@@ -7,8 +7,7 @@ import {
   Center,
 } from "@chakra-ui/layout";
 import { Spinner } from "@chakra-ui/spinner";
-import { useNavigate, useParams } from "react-router";
-import { Link } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { useArticleById } from "../hooks";
 
 const Article = () => {

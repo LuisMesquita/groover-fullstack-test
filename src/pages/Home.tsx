@@ -61,7 +61,7 @@ const Home = () => {
   return (
     <Container>
       <form>
-        <label aria-label="search">
+        <label aria-label="search" id="search-label">
           <Text marginBottom="3" fontWeight="bold">
             Type search query terms in here:
           </Text>
@@ -73,6 +73,7 @@ const Home = () => {
             setSearchParams({ searchValue: value, page: "0" })
           }
           name="search"
+          aria-labelledby="search-label"
           value={searchValue}
           disabled={isFetching}
           size="sm"
@@ -87,7 +88,13 @@ const Home = () => {
           {isFetching
             ? Array(10)
                 .fill("")
-                .map((_, i) => <Skeleton height="35px" key={i} />)
+                .map((_, i) => (
+                  <Skeleton
+                    height="35px"
+                    key={i}
+                    data-testid="article-skeleton"
+                  />
+                ))
             : data?.pages[currentPageIndex]?.docs.map((doc) => (
                 <LinkBox
                   key={getHashId(doc._id)}

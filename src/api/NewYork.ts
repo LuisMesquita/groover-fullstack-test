@@ -56,7 +56,6 @@ export const getArticles = async (params?: GetArticlesParams) => {
     const response = await fetch(
       `${API_ENDPOINT}articlesearch.json?${queryString(query)}`
     );
-
     if (!response.ok) {
       console.error(response.body);
       throw new Error(response.statusText);
