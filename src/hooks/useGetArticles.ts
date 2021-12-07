@@ -7,7 +7,8 @@ export const useGetArticles = (params?: GetArticlesParams) => {
   return useInfiniteQuery<GetArticlesResponse, Error>(
     ["articles", params?.fullText],
     ({ pageParam }) => {
-      return getArticles({ ...params, pageParam });
+      const currentPage = pageParam || params?.pageParam;
+      return getArticles({ ...params, pageParam: currentPage });
     },
     {
       enabled: Boolean(params?.fullText),

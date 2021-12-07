@@ -1,13 +1,15 @@
 import { useCallback, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useDebounce } from "use-debounce/lib";
+import { DEFAULT_PAGE } from "../contants";
 import { useGetArticles } from "../hooks";
 import { getHashId } from "../utils";
 
 const Home = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get("page") || `${DEFAULT_PAGE}`);
+  const searchValue = searchParams.get("searchValue") || "";
   const [debouncedSearchValue] = useDebounce(searchValue, 1000);
-  const [page, setPage] = useState(0);
 
   const {
     data,
@@ -19,21 +21,19 @@ const Home = () => {
     isFetchingPreviousPage,
     isFetchingNextPage,
     status,
-  } = useGetArticles({ fullText: debouncedSearchValue });
+  } = useGetArticles({ fullText: debouncedSearchValue, pageParam: page });
 
   const handleNextPage = useCallback(() => {
-    setPage(page + 1);
-    fetchNextPage({ pageParam: page + 1 });
-  }, [fetchNextPage, page]);
+    const nextPage = page + 1;
+    setSearchParams({ page: nextPage.toString(), searchValue });
+    fetchNextPage({ pageParam: nextPage });
+  }, [fetchNextPage, page, searchValue, setSearchParams]);
 
   const handlePrevPage = useCallback(() => {
-    setPage(page - 1);
-    fetchPreviousPage({ pageParam: page - 1 });
-  }, [fetchPreviousPage, page]);
-
-  if (status === "error") {
-    return <div> {error?.message} </div>;
-  }
+    const prevPage = page - 1;
+    setSearchParams({ page: prevPage.toString(), searchValue });
+    fetchPreviousPage({ pageParam: prevPage });
+  }, [fetchPreviousPage, page, searchValue, setSearchParams]);
 
   return (
     <div>
@@ -41,13 +41,15 @@ const Home = () => {
         <input
           type="text"
           placeholder="Search for a article"
-          onChange={({ target: { value } }) => setSearchValue(value)}
+          onChange={({ target: { value } }) =>
+            setSearchParams({ searchValue: value, page: page.toString() })
+          }
           value={searchValue}
           disabled={isFetching}
         />
       </form>
       <>
-        {data?.pages[page]?.docs.map((doc) => (
+        {data?.pages[page || DEFAULT_PAGE]?.docs.map((doc) => (
           <Link key={getHashId(doc._id)} to={`/article/${getHashId(doc._id)}`}>
             {doc.snippet}
           </Link>
@@ -57,8 +59,10 @@ const Home = () => {
             onClick={() => handlePrevPage()}
             disabled={isFetchingPreviousPage || page <= 0}
           >
-            {isFetchingPreviousPage
+            {isFetchingNextPage
               ? "Loading more..."
+              : page > 0
+              ? "Load More"
               : "Nothing more to load"}
           </button>
         </div>
@@ -76,6 +80,8 @@ const Home = () => {
         </div>
         <div>{isFetching && !isFetchingNextPage ? "Fetching..." : null}</div>
       </>
+
+      {status === "error" && <div> {error?.message} </div>}
     </div>
   );
 };
