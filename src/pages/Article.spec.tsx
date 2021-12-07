@@ -21,6 +21,7 @@ describe("<Article />", () => {
     screen.getByRole("heading", { name: articleDetail.headline.main });
 
     screen.getByText(articleDetail.lead_paragraph);
+    screen.getByText("11/14/2021");
 
     const readFullArticleLink = screen.getByRole("link", {
       name: /read the full article/i,

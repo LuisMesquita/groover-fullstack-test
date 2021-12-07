@@ -7,13 +7,19 @@ import {
   Center,
 } from "@chakra-ui/layout";
 import { Spinner } from "@chakra-ui/spinner";
+import { useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { useArticleById } from "../hooks";
+import { format } from "date-fns";
 
 const Article = () => {
   const { articleId } = useParams();
   const navigate = useNavigate();
   const { isLoading, data, isError, error } = useArticleById({ id: articleId });
+  const formatedDate = useMemo(
+    () => data?.pub_date && format(new Date(data?.pub_date), "MM/dd/yyyy"),
+    [data?.pub_date]
+  );
 
   if (isLoading) {
     return (
@@ -42,9 +48,7 @@ const Article = () => {
       <Heading marginBottom="3" noOfLines={[3, 5, 8]}>
         {data?.headline.main}
       </Heading>
-      {data?.pub_date && (
-        <Text marginBottom="3">{Date.parse(data?.pub_date)}</Text>
-      )}
+      {formatedDate && <Text marginBottom="3">{formatedDate}</Text>}
       {data?.lead_paragraph && (
         <Text marginBottom="2">{data?.lead_paragraph}</Text>
       )}
